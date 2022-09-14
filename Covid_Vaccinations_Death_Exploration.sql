@@ -1,4 +1,9 @@
--- Select data that we will be using
+-- Select data that we will be using to explore and gather useful insights, trends and patterns regarding the covid-19 virus
+
+-- This dataset was publically obtained from the World Health Organization(01/01/2020 - 03/01/2021)
+
+-- With these queries i will extract the result sets and import into an excel file for further analysis, and create a visually appealing and story telling
+-- dashboard utilizing the the Tableau data visualization software. 
 
 SELECT location, date, total_cases, new_cases, total_deaths, population
 FROM dbo.CovidDeaths
@@ -73,3 +78,27 @@ WHERE dea.continent IS NOT NULL
 SELECT * FROM PercentPopulationVaccinated;
 
 -- temp table
+
+SELECT SUM(new_cases) AS total_cases, SUM(CAST(new_deaths AS INT)) AS total_deaths,
+SUM(CAST(new_deaths AS INT))/SUM(new_cases) AS DeathPercentage
+FROM dbo.CovidDeaths
+WHERE continent is not null
+ORDER BY 1,2;
+
+SELECT location, SUM(CAST(new_deaths AS INT)) as TotalDeathCount
+FROM dbo.CovidDeaths
+WHERE continent is NULL
+and location not in ('World', 'European Union', 'International')
+GROUP BY location
+ORDER by TotalDeathCount DESC;
+
+SELECT location, population, MAX(total_cases) AS HighestInfectionCount,
+MAX((total_cases/population))*100 AS PercentPopulationInfected
+FROM dbo.CovidDeaths
+GROUP BY location, population
+ORDER BY PercentPopulationInfected DESC;
+
+SELECT location, population, date, MAX(total_cases) AS HighestInfectionCount, MAX((total_cases/population))*100 AS PercentagePopulationInfected
+FROM dbo.CovidDeaths
+GROUP BY location, population, date
+ORDER BY PercentagePopulationInfected DESC;
